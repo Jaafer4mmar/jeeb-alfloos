@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl" id="htmlTag">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title id="pageTitle">جيب الفلوسسسس - العدالة يمي وبس ⚖️</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -222,16 +222,52 @@
         </div>
 
         <!-- Results Section (Hidden by default) -->
-        <div id="resultsSection" class="hidden bg-emerald-950/40 rounded-2xl p-6 border border-emerald-500/20 shadow-lg mb-8 fade-in">
-            <h3 id="resultsTitle" class="text-xl font-bold text-emerald-300 mb-4 flex items-center gap-2">
+        <div id="resultsSection" class="hidden bg-emerald-950/40 rounded-2xl p-6 border border-emerald-500/20 shadow-lg mb-8 space-y-4 fade-in">
+            <h3 id="resultsTitle" class="text-xl font-bold text-emerald-300 mb-2 flex items-center gap-2">
                 <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-400"></i>
                 النتيجة النهائية (الصافي)
             </h3>
             
-            <div class="mb-4 pb-4 border-b border-emerald-800/40">
+            <div class="grid grid-cols-1 gap-2.5 pb-4 border-b border-emerald-800/40">
                  <p class="text-emerald-200 text-sm font-medium">
                    <span id="sharePerPersonLabel">حصة الفرد الواحد:</span> <span id="sharePerPerson" class="font-bold text-lg text-emerald-400">0</span> <span class="currency-label font-extrabold text-emerald-400">د.ع</span>
                  </p>
+                 
+                 <!-- Change/Excess Card with Interactive Payer Selector -->
+                 <div id="changeSection" class="hidden bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl space-y-3 text-xs">
+                     <div class="flex items-center justify-between gap-3">
+                         <div class="flex items-start gap-2.5 text-amber-300">
+                             <i data-lucide="coins" class="w-5 h-5 text-amber-400 animate-bounce shrink-0 mt-0.5"></i>
+                             <div>
+                                 <p id="changeTitle" class="font-bold text-amber-400">مبلغ الخردة المتبقي (الباقي من الكاشير)</p>
+                                 <p id="changeSubtitle" class="text-[10px] text-slate-300 leading-relaxed mt-0.5">كيف ترغبون في التعامل مع مبلغ الباقي الزائد؟</p>
+                             </div>
+                         </div>
+                         <span class="text-amber-400 font-black text-sm shrink-0"><span id="changeAmount">0</span> <span class="currency-label text-xs font-bold">د.ع</span></span>
+                     </div>
+                     
+                     <!-- New Display: Individual Share of Change (حصة كل شخص من الباقي بالتساوي) -->
+                     <div class="flex justify-between items-center bg-amber-500/5 px-3 py-2.5 rounded-lg border border-amber-500/15">
+                         <span id="changeShareLabel" class="text-slate-300 font-medium">حصة الشخص الواحد من الباقي:</span>
+                         <span class="text-amber-400 font-bold text-xs md:text-sm shrink-0"><span id="changeShareAmount">0</span> <span class="currency-label text-[10px] font-bold">د.ع</span></span>
+                     </div>
+                     
+                     <!-- Interactive Options for Handling Excess -->
+                     <div class="pt-3 border-t border-amber-500/20 space-y-2">
+                         <p id="whoKeptLabel" class="text-[10px] text-amber-300/80 mb-2 font-bold">طريقة تسوية الباقي (الخردة الزائدة):</p>
+                         <div id="changeMethodsContainer" class="flex flex-col gap-2">
+                             <!-- Radio cards rendered dynamically in JS -->
+                         </div>
+                         
+                         <!-- Specific Person Pill Area -->
+                         <div id="specificPersonArea" class="hidden pt-3 border-t border-amber-500/10 fade-in">
+                             <p id="selectPayerLabel" class="text-[9px] text-slate-400 mb-1.5 font-bold">اختر الشخص الذي استلم كامل المبلغ النقدي من الكاشير وضعه في جيبه:</p>
+                             <div id="changePillsContainer" class="flex flex-wrap gap-1.5">
+                                 <!-- Friend pills rendered here -->
+                             </div>
+                         </div>
+                     </div>
+                 </div>
             </div>
 
             <div id="cleanSlateMessage" class="hidden text-center py-4">
@@ -413,8 +449,19 @@
                 placeholderPaid: "كم دفع بالفعل؟ (0)",
                 errorMinPeople: "يجب أن يكون هناك شخصان على الأقل للتقسيم.",
                 errorBillAmount: "الرجاء إدخال مبلغ الفاتورة الكلي بشكل صحيح.",
-                errorMismatch: "تنبيه: مجموع ما دفعه الأشخاص ({paid}) لا يساوي المبلغ الكلي للفاتورة ({bill}).",
+                errorMismatch: "تنبيه: مجموع ما دفعه الأشخاص ({paid}) أقل من مبلغ الفاتورة الكلية ({bill}).",
                 labelPays: "يدفع",
+                changeTitle: "مبلغ الخردة المتبقي (الباقي من الكاشير)",
+                changeSubtitle: "كيف ترغبون في التعامل مع مبلغ الباقي الزائد؟",
+                changeShareLabel: "حصة كل شخص بالتساوي من الباقي:",
+                whoKeptLabel: "طريقة تسوية الباقي (الخردة الزائدة):",
+                optSplitDebts: "خصم الباقي بالتساوي في الديون (دون تقسيم الكاش) 🌟",
+                optSplitDebtsDesc: "يستلم شخص واحد الباقي كاش، ويقوم البرنامج بخصم نصيب كل فرد بالتساوي تلقائياً من مديونيته ليوفر عليكم تجزئة الخردة.",
+                optAutoPayer: "خصم تلقائي بالتساوي على الدافعين",
+                optAutoPayerDesc: "يعتبر البرنامج الباقي كخصم تلقائي يوزع بالتساوي فقط على من ساهم بالدفع (دون تعديل ديون غير الدافعين).",
+                optSplitReality: "قمنا بتقسيم الباقي كاش بالتساوي يدوياً",
+                optSplitRealityDesc: "استلمنا الباقي كاش وقسمناه بالتساوي بيننا يدوياً في الواقع داخل المطعم.",
+                selectPayerLabel: "اختر الشخص الذي استلم كامل المبلغ النقدي من الكاشير وضعه في جيبه:",
                 currencies: {
                     "دينار عراقي": "🇮🇶 دينار عراقي (IQD)",
                     "ريال سعودي": "🇸🇦 ريال سعودي (SAR)",
@@ -492,8 +539,19 @@
                 placeholderPaid: "How much paid? (0)",
                 errorMinPeople: "There must be at least two people to split the bill.",
                 errorBillAmount: "Please enter the total bill amount correctly.",
-                errorMismatch: "Alert: The total of what everyone paid ({paid}) does not match the total bill amount ({bill}).",
+                errorMismatch: "Alert: The total of what everyone paid ({paid}) is less than the total bill ({bill}).",
                 labelPays: "pays",
+                changeTitle: "Remaining Change (Cashier Excess)",
+                changeSubtitle: "How would you like to handle the excess change?",
+                changeShareLabel: "Each person's equal share of the change:",
+                whoKeptLabel: "Method of settling the change (excess):",
+                optSplitDebts: "Deduct change equally in debts (No cash split) 🌟",
+                optSplitDebtsDesc: "One person keeps the cash change, and the app automatically deducts everyone's equal share of it from the debts.",
+                optAutoPayer: "Auto-deduct equally from contributors",
+                optAutoPayerDesc: "The app treats the change as an equal discount only for those who paid, adjusting the debts accordingly.",
+                optSplitReality: "We split the cash change equally in reality",
+                optSplitRealityDesc: "We physically divided the returned change equally among everyone at the restaurant.",
+                selectPayerLabel: "Choose the person who kept the entire cash change in their pocket:",
                 currencies: {
                     "دينار عراقي": "🇮🇶 Iraqi Dinar (IQD)",
                     "ريال سعودي": "🇸🇦 Saudi Riyal (SAR)",
@@ -535,6 +593,8 @@
         let currentCurrency = 'دينار عراقي';
         let currentRating = 0;
         let currentLang = 'ar';
+        let changeMethod = 'split_debts'; // 'split_debts', 'auto', 'split_reality'
+        let whoKeptChangeId = null; // ID of the person who kept the physical cash
 
         // --- DOM Elements ---
         const htmlTag = document.getElementById('htmlTag');
@@ -554,6 +614,19 @@
         const transactionsList = document.getElementById('transactionsList');
         const currencySelector = document.getElementById('currencySelector');
         const billCurrencySymbol = document.getElementById('billCurrencySymbol');
+        
+        // Change Elements
+        const changeSection = document.getElementById('changeSection');
+        const changeAmountEl = document.getElementById('changeAmount');
+        const changeTitleEl = document.getElementById('changeTitle');
+        const changeSubtitleEl = document.getElementById('changeSubtitle');
+        const changeShareLabelEl = document.getElementById('changeShareLabel');
+        const changeShareAmountEl = document.getElementById('changeShareAmount');
+        const whoKeptLabelEl = document.getElementById('whoKeptLabel');
+        const changeMethodsContainer = document.getElementById('changeMethodsContainer');
+        const specificPersonArea = document.getElementById('specificPersonArea');
+        const selectPayerLabelEl = document.getElementById('selectPayerLabel');
+        const changePillsContainer = document.getElementById('changePillsContainer');
 
         // Sidebar Elements
         const sidebar = document.getElementById('sidebar');
@@ -576,7 +649,6 @@
         }
 
         async function syncSessionToSupabase() {
-            // Triggered only upon explicit operations like calculation or reset to prevent spamming
             const client = getSupabaseClient();
             if (client) {
                 try {
@@ -692,10 +764,13 @@
             document.getElementById('sharePerPersonLabel').textContent = t.sharePerPersonLabel;
             document.getElementById('cleanSlateText').textContent = t.cleanSlateText;
             
-            document.getElementById('footerDevBy').textContent = t.footerDevBy;
-            document.getElementById('footerCopyright').textContent = t.footerCopyright;
+            // Lack of change texts
+            changeTitleEl.textContent = t.changeTitle;
+            changeSubtitleEl.textContent = t.changeSubtitle;
+            changeShareLabelEl.textContent = t.changeShareLabel;
+            whoKeptLabelEl.textContent = t.whoKeptLabel;
+            selectPayerLabelEl.textContent = t.selectPayerLabel;
 
-            // Modals Translation
             document.getElementById('contactModalTitle').innerHTML = `<i data-lucide="mail" class="w-5 h-5"></i> ${t.contactModalTitle}`;
             document.getElementById('contactNameLabel').textContent = t.contactNameLabel;
             document.getElementById('contactName').placeholder = t.contactNamePlaceholder;
@@ -762,7 +837,6 @@
                             oninput="updatePerson('${person.id}', 'name', this.value)"
                             class="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
                         />
-                        <!-- Zero Overlap Flex Input Group / مجموعة حقول الكتابة المتجاورة لضمان عدم التداخل وترجمة العملة ديناميكياً -->
                         <div class="flex rounded-lg overflow-hidden border border-slate-700/80 focus-within:ring-2 focus-within:ring-emerald-500 transition-all">
                             <input
                                 type="number"
@@ -896,7 +970,6 @@
             const client = getSupabaseClient();
             if (client) {
                 try {
-                    // Send to public.feedback table
                     const { error } = await client.from('feedback').insert([{
                         rating: parseInt(currentRating) || 0,
                         comments: commentsVal,
@@ -955,20 +1028,113 @@
             hideResults();
         }
 
+        // Show error message
         function showError(msg) {
             errorText.textContent = msg;
             errorMessage.classList.remove('hidden');
         }
 
+        // Hide error message
         function hideError() {
             errorMessage.classList.add('hidden');
         }
 
+        // Hide results
         function hideResults() {
             resultsSection.classList.add('hidden');
         }
 
-        // --- Split Algorithm ---
+        // --- Render Change Selector Radio Cards and Pills Dynamically ---
+        function renderChangeMethodsUI(changeExcess) {
+            const t = translations[currentLang];
+            changeMethodsContainer.innerHTML = '';
+
+            // Configuration for the 3 selectable methods
+            const methods = [
+                {
+                    id: 'split_debts',
+                    title: t.optSplitDebts,
+                    desc: t.optSplitDebtsDesc,
+                    icon: 'divide'
+                },
+                {
+                    id: 'auto',
+                    title: t.optAutoPayer,
+                    desc: t.optAutoPayerDesc,
+                    icon: 'coins'
+                },
+                {
+                    id: 'split_reality',
+                    title: t.optSplitReality,
+                    desc: t.optSplitRealityDesc,
+                    icon: 'user-check'
+                }
+            ];
+
+            methods.forEach(m => {
+                const isActive = changeMethod === m.id;
+                
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = `w-full text-start p-3 rounded-xl border-2 transition-all flex items-start gap-3 ${
+                    isActive 
+                    ? 'bg-amber-500/10 border-amber-400 shadow-md shadow-amber-400/5 text-amber-300' 
+                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700/60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="p-2 rounded-lg ${isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-400'} shrink-0 mt-0.5">
+                        <i data-lucide="${m.icon}" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-xs ${isActive ? 'text-amber-300' : 'text-slate-200'}">${m.title}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">${m.desc}</p>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    changeMethod = m.id;
+                    calculateSplit();
+                });
+
+                changeMethodsContainer.appendChild(card);
+            });
+
+            // If "split_debts" is active, render their name selection pills
+            if (changeMethod === 'split_debts') {
+                specificPersonArea.classList.remove('hidden');
+                changePillsContainer.innerHTML = '';
+                
+                // Find highest payer's ID as default
+                const highestPayer = people.reduce((max, p) => (parseFloat(p.paidAmount) || 0) > (parseFloat(max.paidAmount) || 0) ? p : max, people[0]);
+                if (!whoKeptChangeId || !people.some(p => p.id === whoKeptChangeId)) {
+                    whoKeptChangeId = highestPayer.id;
+                }
+
+                people.forEach(p => {
+                    const personPill = document.createElement('button');
+                    personPill.type = 'button';
+                    const isPillActive = whoKeptChangeId === p.id;
+                    personPill.className = `px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
+                        isPillActive 
+                        ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md shadow-amber-400/10' 
+                        : 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-amber-300 hover:border-amber-500/50'
+                    }`;
+                    personPill.textContent = p.name || (currentLang === 'ar' ? 'شخص' : 'Person');
+                    personPill.addEventListener('click', () => {
+                        whoKeptChangeId = p.id;
+                        calculateSplit();
+                    });
+                    changePillsContainer.appendChild(personPill);
+                });
+            } else {
+                specificPersonArea.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        // --- Split Algorithm with Auto-Change (Excess) Reduction Solution ---
         function calculateSplit() {
             const t = translations[currentLang];
             const shortLabel = t.currencyShort[currentCurrency] || currentCurrency;
@@ -981,7 +1147,8 @@
                 return;
             }
 
-            if (Math.abs(totalPaid - bill) > 0.1) {
+            // If what is paid is strictly less than the total bill
+            if (totalPaid < bill - 0.1) {
                 const formattedPaid = totalPaid.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
                 const formattedBill = bill.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
                 const errMsg = t.errorMismatch
@@ -993,13 +1160,67 @@
 
             hideError();
 
+            // Calculate change / excess if total paid is more than total bill
+            const changeExcess = totalPaid - bill;
+            const hasChange = changeExcess > 0.01;
+
+            if (hasChange) {
+                changeAmountEl.textContent = changeExcess.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 });
+                
+                // Calculate and display individual share of remaining change (حصة كل شخص من الباقي بالتساوي)
+                const shareOfChange = changeExcess / people.length;
+                changeShareAmountEl.textContent = shareOfChange.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 });
+                
+                changeSection.classList.remove('hidden');
+                
+                // Fallback selected whoKeptChange if the person has been deleted
+                const personExists = people.some(p => p.id === whoKeptChangeId);
+                if (!personExists && changeMethod === 'split_debts') {
+                    whoKeptChangeId = null; 
+                }
+                // Render radio cards and selector pills
+                renderChangeMethodsUI(changeExcess);
+            } else {
+                changeSection.classList.add('hidden');
+            }
+
+            // Individual share of the actual bill
             const sharePerPerson = bill / people.length;
             sharePerPersonEl.textContent = sharePerPerson.toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 });
 
-            let balances = people.map(p => ({
-                name: p.name || (currentLang === 'ar' ? 'شخص غير معروف' : 'Unknown'),
-                balance: (parseFloat(p.paidAmount) || 0) - sharePerPerson
-            }));
+            // Count how many people actually paid something
+            const payersCount = people.filter(p => (parseFloat(p.paidAmount) || 0) > 0).length;
+            const changePerPayer = payersCount > 0 ? changeExcess / payersCount : 0;
+
+            let balances = people.map(p => {
+                const actualPaid = parseFloat(p.paidAmount) || 0;
+                let adjustedPaid = actualPaid;
+
+                if (changeMethod === 'split_reality') {
+                    // Option 3: Split cash equally in reality
+                    const changePortionPerPerson = changeExcess / people.length;
+                    adjustedPaid = actualPaid - changePortionPerPerson;
+                } else if (changeMethod === 'auto') {
+                    // Option 2: Equal discount for contributors only
+                    if (actualPaid > 0) {
+                        adjustedPaid = actualPaid - changePerPayer;
+                    } else {
+                        adjustedPaid = actualPaid;
+                    }
+                } else if (changeMethod === 'split_debts') {
+                    // Option 1: Deduct change equally in debts (One friend took the total change and holds it)
+                    if (whoKeptChangeId === p.id) {
+                        adjustedPaid = actualPaid - changeExcess;
+                    } else {
+                        adjustedPaid = actualPaid;
+                    }
+                }
+
+                return {
+                    name: p.name || (currentLang === 'ar' ? 'شخص غير معروف' : 'Unknown'),
+                    balance: adjustedPaid - sharePerPerson
+                };
+            });
 
             let debtors = balances.filter(p => p.balance < -0.01).map(p => ({ ...p, balance: Math.abs(p.balance) }));
             let creditors = balances.filter(p => p.balance > 0.01);
@@ -1071,6 +1292,8 @@
         // --- Reset App ---
         function resetApp() {
             totalBillInput.value = '';
+            changeMethod = 'split_debts';
+            whoKeptChangeId = null;
             
             if (currentLang === 'ar') {
                 people = [
@@ -1089,6 +1312,7 @@
             hideResults();
             renderPeople();
             updateCurrencyLabels();
+            changeSection.classList.add('hidden');
             showToast(translations[currentLang].toastResetSuccess);
             
             // Clear or update session state on database background task
