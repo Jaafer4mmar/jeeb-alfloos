@@ -39,6 +39,36 @@
     <div class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
     <div class="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
+    <!-- Welcome / Login Screen -->
+    <div id="welcomeScreen" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 transition-opacity duration-500 hidden">
+        <div class="bg-slate-800/80 border border-slate-700/60 p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center fade-in relative overflow-hidden">
+            <div class="absolute inset-0 bg-emerald-500/5 blur-3xl -z-10"></div>
+            
+            <div class="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-white/5 relative z-10">
+                <img src="https://i.imgur.com/J50D5rw.png" alt="Logo" class="w-14 h-14 object-contain" />
+            </div>
+            
+            <h2 id="welcomeTitle" class="text-2xl font-extrabold text-white mb-1.5">جيب الفلوسسسس 💸</h2>
+            <p id="welcomeSubtitle" class="text-xs text-emerald-400 font-medium mb-8">العدالة يمي وبس.. أدخل اسمك للبدء</p>
+            
+            <form id="welcomeForm" class="space-y-4 relative z-10 text-start">
+                <div>
+                    <label id="welcomeNameLabel" class="block text-xs font-semibold text-slate-300 mb-2">اسمك الكريم</label>
+                    <input 
+                        type="text" 
+                        id="welcomeNameInput" 
+                        required 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-center placeholder:text-slate-500" 
+                    />
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2">
+                    <span id="welcomeStartBtn">ابدأ الآن</span>
+                    <i data-lucide="arrow-left" class="w-4 h-4 rtl:rotate-0 ltr:rotate-180"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- App Header -->
     <header class="bg-emerald-600/90 backdrop-blur-md text-white pt-12 pb-6 px-6 rounded-b-3xl shadow-lg relative overflow-hidden border-b border-emerald-500/30">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
@@ -246,7 +276,7 @@
                          <span class="text-amber-400 font-black text-sm shrink-0"><span id="changeAmount">0</span> <span class="currency-label text-xs font-bold">د.ع</span></span>
                      </div>
                      
-                     <!-- New Display: Individual Share of Change (حصة كل شخص من الباقي بالتساوي) -->
+                     <!-- New Display: Individual Share of Change -->
                      <div class="flex justify-between items-center bg-amber-500/5 px-3 py-2.5 rounded-lg border border-amber-500/15">
                          <span id="changeShareLabel" class="text-slate-300 font-medium">حصة الشخص الواحد من الباقي:</span>
                          <span class="text-amber-400 font-bold text-xs md:text-sm shrink-0"><span id="changeShareAmount">0</span> <span class="currency-label text-[10px] font-bold">د.ع</span></span>
@@ -384,15 +414,11 @@
         const SUPABASE_KEY = "sb_publishable_dN9bDk1iDAEAoC50p17MtQ_sd3kwgdx";
         let supabaseClient = null;
 
-        // Lazy Initializer to ensure library is fully resolved before usage
         function getSupabaseClient() {
             if (!supabaseClient) {
                 try {
                     if (typeof supabase !== 'undefined') {
                         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                        console.log("Supabase Client initialized successfully on demand.");
-                    } else {
-                        console.warn("Supabase library not loaded yet.");
                     }
                 } catch (e) {
                     console.error("Error lazy-initializing Supabase Client:", e);
@@ -404,6 +430,10 @@
         // --- Translations Dictionary ---
         const translations = {
             ar: {
+                welcomeTitle: "جيب الفلوسسسس 💸",
+                welcomeSubtitle: "العدالة يمي وبس.. أدخل اسمك للبدء",
+                welcomeNameLabel: "اسمك الكريم",
+                welcomeStartBtn: "ابدأ الآن",
                 pageTitle: "جيب الفلوسسسس - العدالة يمي وبس ⚖️",
                 headerTitle: "جيب الفلوسسسس 💸",
                 headerSubtitle: "العدالة يمي وبس ⚖️",
@@ -494,6 +524,10 @@
                 }
             },
             en: {
+                welcomeTitle: "Jeeb El-Foloos 💸",
+                welcomeSubtitle: "Absolute Justice.. Enter your name to start",
+                welcomeNameLabel: "Your Full Name",
+                welcomeStartBtn: "Start Now",
                 pageTitle: "Jeeb El-Foloos - Absolute Justice ⚖️",
                 headerTitle: "Jeeb El-Foloos 💸",
                 headerSubtitle: "Justice stands here ⚖️",
@@ -593,11 +627,20 @@
         let currentCurrency = 'دينار عراقي';
         let currentRating = 0;
         let currentLang = 'ar';
-        let changeMethod = 'split_debts'; // 'split_debts', 'auto', 'split_reality'
-        let whoKeptChangeId = null; // ID of the person who kept the physical cash
+        let changeMethod = 'split_debts';
+        let whoKeptChangeId = null;
+        let loggedUserName = '';
+
+        // Random Names for Welcome Placeholder
+        const randomNamesAr = ["محمد علي", "أحمد حسن", "ياسر عمار", "زينب خالد", "فاطمة سعد", "جعفر محمود", "حسين كاظم", "سجاد حيدر"];
+        const randomNamesEn = ["John Doe", "Jane Smith", "Michael Johnson", "Sarah Williams", "David Brown", "Emma Wilson", "Daniel Lee"];
 
         // --- DOM Elements ---
         const htmlTag = document.getElementById('htmlTag');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const welcomeForm = document.getElementById('welcomeForm');
+        const welcomeNameInput = document.getElementById('welcomeNameInput');
+        
         const langSwitchBtn = document.getElementById('langSwitchBtn');
         const langBtnText = document.getElementById('langBtnText');
         const totalBillInput = document.getElementById('totalBill');
@@ -639,9 +682,8 @@
         const feedbackMenuLink = document.getElementById('feedbackMenuLink');
         const homeMenuLink = document.getElementById('homeMenuLink');
 
-        // --- Local Storage Sync & Non-blocking Supabase Sync ---
+        // --- Local Storage Sync & Supabase Sync ---
         function saveProgress() {
-            // Save locally immediately
             localStorage.setItem('bill_people_v2', JSON.stringify(people));
             localStorage.setItem('bill_totalBill_v2', totalBillInput.value);
             localStorage.setItem('bill_currency_v2', currentCurrency);
@@ -664,6 +706,7 @@
                         total_bill: parseFloat(totalBillInput.value) || 0,
                         currency: currentCurrency,
                         language: currentLang,
+                        host_name: loggedUserName, // Attach the user's name
                         updated_at: new Date().toISOString()
                     });
                 } catch (e) {
@@ -673,6 +716,7 @@
         }
 
         async function loadProgress() {
+            loggedUserName = localStorage.getItem('bill_user_name_v2') || '';
             const savedPeople = localStorage.getItem('bill_people_v2');
             const savedBill = localStorage.getItem('bill_totalBill_v2');
             const savedCurrency = localStorage.getItem('bill_currency_v2');
@@ -686,16 +730,26 @@
 
             applyLanguage();
 
+            // Handle Welcome Screen
+            if (!loggedUserName) {
+                const list = currentLang === 'ar' ? randomNamesAr : randomNamesEn;
+                welcomeNameInput.placeholder = list[Math.floor(Math.random() * list.length)];
+                welcomeScreen.classList.remove('hidden');
+            }
+
             if (savedPeople) {
                 people = JSON.parse(savedPeople);
             } else {
                 if (currentLang === 'en') {
                     people = [
-                        { id: '1', name: 'Ahmed', paidAmount: '' },
+                        { id: '1', name: loggedUserName || 'Ahmed', paidAmount: '' },
                         { id: '2', name: 'Ali', paidAmount: '' }
                     ];
+                } else if (loggedUserName) {
+                    people[0].name = loggedUserName;
                 }
             }
+            
             if (savedBill) {
                 totalBillInput.value = savedBill;
             }
@@ -706,19 +760,49 @@
             updateCurrencyLabels();
         }
 
+        // Welcome Form Submission
+        welcomeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = welcomeNameInput.value.trim();
+            if (val) {
+                loggedUserName = val;
+                localStorage.setItem('bill_user_name_v2', val);
+                
+                // Replace default Person 1 name if it hasn't been customized yet
+                if (people[0].name === 'أحمد' || people[0].name === 'Ahmed') {
+                    people[0].name = val;
+                    saveProgress();
+                    renderPeople();
+                }
+
+                welcomeScreen.classList.add('opacity-0');
+                setTimeout(() => {
+                    welcomeScreen.classList.add('hidden');
+                }, 500);
+            }
+        });
+
         // --- Language Switch Handler ---
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             
+            // Adjust default names when language is toggled on empty values
             if (people.length === 2 && people[0].name === 'أحمد' && people[1].name === 'علي' && currentLang === 'en') {
-                people[0].name = 'Ahmed';
+                people[0].name = loggedUserName || 'Ahmed';
                 people[1].name = 'Ali';
-            } else if (people.length === 2 && people[0].name === 'Ahmed' && people[1].name === 'Ali' && currentLang === 'ar') {
-                people[0].name = 'أحمد';
+            } else if (people.length === 2 && (people[0].name === 'Ahmed' || people[0].name === loggedUserName) && people[1].name === 'Ali' && currentLang === 'ar') {
+                people[0].name = loggedUserName || 'أحمد';
                 people[1].name = 'علي';
             }
 
             applyLanguage();
+            
+            // Update welcome placeholder if still visible
+            if (!welcomeScreen.classList.contains('hidden')) {
+                const list = currentLang === 'ar' ? randomNamesAr : randomNamesEn;
+                welcomeNameInput.placeholder = list[Math.floor(Math.random() * list.length)];
+            }
+
             saveProgress();
             renderPeople();
             hideResults();
@@ -742,6 +826,11 @@
             }
 
             // Update DOM element texts
+            document.getElementById('welcomeTitle').textContent = t.welcomeTitle;
+            document.getElementById('welcomeSubtitle').textContent = t.welcomeSubtitle;
+            document.getElementById('welcomeNameLabel').textContent = t.welcomeNameLabel;
+            document.getElementById('welcomeStartBtn').textContent = t.welcomeStartBtn;
+
             document.getElementById('pageTitle').textContent = t.pageTitle;
             document.getElementById('headerTitle').textContent = t.headerTitle;
             document.getElementById('headerSubtitle').textContent = t.headerSubtitle;
@@ -778,14 +867,13 @@
             document.getElementById('contactInfo').placeholder = t.contactInfoPlaceholder;
             document.getElementById('contactMsgLabel').textContent = t.contactMsgLabel;
             document.getElementById('contactMsg').placeholder = t.contactMsgPlaceholder;
-            document.getElementById('contactSubmitBtn').textContent = t.contactSubmitBtn;
-            document.getElementById('contactSuccess').textContent = t.contactSuccessText;
+            document.getElementById('contactSubmitBtn').innerHTML = `<span id="contactSubmitBtnText">${t.contactSubmitBtn}</span>`;
 
             document.getElementById('feedbackModalTitle').innerHTML = `<i data-lucide="heart" class="w-5 h-5"></i> ${t.feedbackModalTitle}`;
             document.getElementById('feedbackRatingLabel').textContent = t.feedbackRatingLabel;
             document.getElementById('feedbackCommentsLabel').textContent = t.feedbackCommentsLabel;
             document.getElementById('feedbackComments').placeholder = t.feedbackCommentsPlaceholder;
-            document.getElementById('feedbackSubmitBtn').textContent = t.feedbackSubmitBtn;
+            document.getElementById('feedbackSubmitBtn').innerHTML = `<span id="feedbackSubmitBtnText">${t.feedbackSubmitBtn}</span>`;
             document.getElementById('feedbackSuccess').textContent = t.feedbackSuccessText;
 
             renderCurrencyOptions();
@@ -894,6 +982,11 @@
             closeSidebar();
             const modal = document.getElementById(id);
             modal.classList.remove('hidden');
+            
+            // Pre-fill names in contact form if logged in
+            if (id === 'contactModal' && loggedUserName) {
+                document.getElementById('contactName').value = loggedUserName;
+            }
         }
 
         window.closeModal = function(id) {
@@ -971,6 +1064,7 @@
             if (client) {
                 try {
                     const { error } = await client.from('feedback').insert([{
+                        user_name: loggedUserName, // <-- تم ربط اسم المستخدم هنا
                         rating: parseInt(currentRating) || 0,
                         comments: commentsVal,
                         created_at: new Date().toISOString()
@@ -1297,26 +1391,28 @@
             
             if (currentLang === 'ar') {
                 people = [
-                    { id: '1', name: 'أحمد', paidAmount: '' },
+                    { id: '1', name: loggedUserName || 'أحمد', paidAmount: '' },
                     { id: '2', name: 'علي', paidAmount: '' }
                 ];
             } else {
                 people = [
-                    { id: '1', name: 'Ahmed', paidAmount: '' },
+                    { id: '1', name: loggedUserName || 'Ahmed', paidAmount: '' },
                     { id: '2', name: 'Ali', paidAmount: '' }
                 ];
             }
 
-            localStorage.clear();
+            // Only clear bill specific keys, preserve user name
+            localStorage.removeItem('bill_people_v2');
+            localStorage.removeItem('bill_totalBill_v2');
+            localStorage.removeItem('bill_currency_v2');
+            localStorage.removeItem('supabase_session_id');
+
             hideError();
             hideResults();
             renderPeople();
             updateCurrencyLabels();
             changeSection.classList.add('hidden');
             showToast(translations[currentLang].toastResetSuccess);
-            
-            // Clear or update session state on database background task
-            syncSessionToSupabase();
         }
 
         // --- Event Listeners ---
