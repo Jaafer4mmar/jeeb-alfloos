@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- الصفحة الرئيسية - Arabic (Default) -->
+  <url>
+    <loc>https://jeeb-alfloos.vercel.app/</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jeeb-alfloos.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jeeb-alfloos.vercel.app/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jeeb-alfloos.vercel.app/"/>
+  </url>
+
+  <!-- الصفحة الرئيسية - English Version -->
+  <url>
+    <loc>https://jeeb-alfloos.vercel.app/?lang=en</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jeeb-alfloos.vercel.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jeeb-alfloos.vercel.app/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jeeb-alfloos.vercel.app/"/>
+  </url>
+
+  <!-- قسم حاسبة تقسيم الفاتورة (المحتوى التفاعلي الرئيسي) -->
+  <url>
+    <loc>https://jeeb-alfloos.vercel.app/#calculator</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jeeb-alfloos.vercel.app/#calculator"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jeeb-alfloos.vercel.app/?lang=en#calculator"/>
+  </url>
+
+  <!-- صفحة / قسم اتصل بنا -->
+  <url>
+    <loc>https://jeeb-alfloos.vercel.app/#contact</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jeeb-alfloos.vercel.app/#contact"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jeeb-alfloos.vercel.app/?lang=en#contact"/>
+  </url>
+
+  <!-- صفحة / قسم رأيك يهمنا (التقييم والملاحظات) -->
+  <url>
+    <loc>https://jeeb-alfloos.vercel.app/#feedback</loc>
+    <lastmod>2026-06-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jeeb-alfloos.vercel.app/#feedback"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jeeb-alfloos.vercel.app/?lang=en#feedback"/>
+  </url>
+
+</urlset>
